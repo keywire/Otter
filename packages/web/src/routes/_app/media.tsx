@@ -333,7 +333,7 @@ function RouteComponent() {
                 key={status}
                 status={status}
                 title={title}
-                media={filteredMedia[status]}
+                media={filteredMedia[status] ?? []}
                 onEdit={handleEditMedia}
               />
             ))}
