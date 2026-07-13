@@ -22,50 +22,54 @@ export const CollectionList = ({ collections, tags }: TypeListProps) => (
     </CollapsibleTrigger>
     <CollapsibleContent>
       <Flex gapY="3xs" direction="column">
-        {collections?.length
-          ? collections
-              .map(({ bookmark_count, collection }) => {
-                if (!collection) {
-                  return null
-                }
+        {collections?.length ? (
+          collections
+            .map(({ bookmark_count, collection }) => {
+              if (!collection) {
+                return null
+              }
 
-                let count = bookmark_count || 0
-                // also count up tags that match the collection name
-                const matchingTags = tags?.filter((item) => {
-                  return item.tag?.toLowerCase() === collection.toLowerCase()
-                })
-                for (const tag of matchingTags!) {
-                  if (tag?.count) {
-                    count += tag.count
-                  }
-                }
-                return {
-                  collection,
-                  count,
-                }
+              let count = bookmark_count || 0
+              // also count up tags that match the collection name
+              const matchingTags = tags?.filter((item) => {
+                return item.tag?.toLowerCase() === collection.toLowerCase()
               })
-              .sort((a, b) => (b?.count ?? 0) - (a?.count ?? 0))
-              .map((item) => {
-                if (!item) {
-                  return null
+              for (const tag of matchingTags!) {
+                if (tag?.count) {
+                  count += tag.count
                 }
-                return (
-                  <SidebarLink
-                    count={item.count}
-                    href={`/collection/${encodeURIComponent(item.collection)}`}
-                    activePath={`/collection/${encodeURIComponent(item.collection)}`}
-                    key={item.collection}
-                  >
-                    <FolderIcon
-                      size={18}
-                      weight="duotone"
-                      aria-label={item.collection}
-                    />
-                    {item.collection}
-                  </SidebarLink>
-                )
-              })
-          : null}
+              }
+              return {
+                collection,
+                count,
+              }
+            })
+            .sort((a, b) => (b?.count ?? 0) - (a?.count ?? 0))
+            .map((item) => {
+              if (!item) {
+                return null
+              }
+              return (
+                <SidebarLink
+                  count={item.count}
+                  href={`/collection/${encodeURIComponent(item.collection)}`}
+                  activePath={`/collection/${encodeURIComponent(item.collection)}`}
+                  key={item.collection}
+                >
+                  <FolderIcon
+                    size={18}
+                    weight="duotone"
+                    aria-label={item.collection}
+                  />
+                  {item.collection}
+                </SidebarLink>
+              )
+            })
+        ) : (
+          <Text variant="count" className="px-2xs py-3xs">
+            {CONTENT.collectionsEmpty}
+          </Text>
+        )}
       </Flex>
     </CollapsibleContent>
   </Collapsible>

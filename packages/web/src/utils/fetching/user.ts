@@ -108,9 +108,11 @@ export const updateUserMutation = () => {
 
       return { previousProfile }
     },
-    onSettled: async () => {
-      toast.success('User settings updated successfully')
-      await queryClient.invalidateQueries({ queryKey: ['userProfile'] })
-    },
+    // These mutations persist background UI preferences (sidebar section
+    // visibility, pinned tags, etc.), so they stay silent — no success toast.
+    // We also intentionally do not refetch on success: the optimistic update in
+    // `onMutate` already holds the new value, and re-fetching here can briefly
+    // revert it (e.g. a collapsible snapping shut again) if the read races the
+    // write. `onError` rolls the optimistic value back.
   })
 }

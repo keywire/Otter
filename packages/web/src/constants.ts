@@ -13,6 +13,7 @@ export const CONTENT = {
   allDescription: 'All your items',
   appName: 'Otter',
   appSettingsTitle: 'App settings',
+  collectionsEmpty: 'No collections yet',
   collectionsNav: 'Collections',
   dashboardNav: 'Dashboard',
   dashboardTitle: 'Dashboard',
