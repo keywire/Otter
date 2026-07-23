@@ -21,42 +21,46 @@ export const CollectionList = ({ collections }: TypeListProps) => (
     </CollapsibleTrigger>
     <CollapsibleContent>
       <Flex gapY="3xs" direction="column">
-        {collections?.length
-          ? collections
-              .map(({ bookmark_count, collection }) => {
-                if (!collection) {
-                  return null
-                }
+        {collections?.length ? (
+          collections
+            .map(({ bookmark_count, collection }) => {
+              if (!collection) {
+                return null
+              }
 
-                // bookmark_count already includes bookmarks tagged with the
-                // bare collection name — don't add tag counts on top.
-                return {
-                  collection,
-                  count: bookmark_count || 0,
-                }
-              })
-              .sort((a, b) => (b?.count ?? 0) - (a?.count ?? 0))
-              .map((item) => {
-                if (!item) {
-                  return null
-                }
-                return (
-                  <SidebarLink
-                    count={item.count}
-                    href={`/collection/${encodeURIComponent(item.collection)}`}
-                    activePath={`/collection/${encodeURIComponent(item.collection)}`}
-                    key={item.collection}
-                  >
-                    <FolderIcon
-                      size={18}
-                      weight="duotone"
-                      aria-label={item.collection}
-                    />
-                    {item.collection}
-                  </SidebarLink>
-                )
-              })
-          : null}
+              // bookmark_count already includes bookmarks tagged with the
+              // bare collection name — don't add tag counts on top.
+              return {
+                collection,
+                count: bookmark_count || 0,
+              }
+            })
+            .sort((a, b) => (b?.count ?? 0) - (a?.count ?? 0))
+            .map((item) => {
+              if (!item) {
+                return null
+              }
+              return (
+                <SidebarLink
+                  count={item.count}
+                  href={`/collection/${encodeURIComponent(item.collection)}`}
+                  activePath={`/collection/${encodeURIComponent(item.collection)}`}
+                  key={item.collection}
+                >
+                  <FolderIcon
+                    size={18}
+                    weight="duotone"
+                    aria-label={item.collection}
+                  />
+                  {item.collection}
+                </SidebarLink>
+              )
+            })
+        ) : (
+          <Text variant="count" className="px-2xs py-3xs">
+            {CONTENT.collectionsEmpty}
+          </Text>
+        )}
       </Flex>
     </CollapsibleContent>
   </Collapsible>

@@ -23,9 +23,13 @@ window.onload = () => {
   })
 
   const urlField = document.querySelector('#url')
-  browserAPI.storage.sync.get('otterInstanceUrl', ({ otterInstanceUrl }) => {
-    urlField.value = otterInstanceUrl
-  })
+  // browserAPI is webextension-polyfill, which is promise-based — a callback
+  // passed here is never invoked, leaving the field blank.
+  browserAPI.storage.sync
+    .get('otterInstanceUrl')
+    .then(({ otterInstanceUrl }) => {
+      urlField.value = otterInstanceUrl ?? ''
+    })
 
   getStorageItems().then(({ otterInstanceUrl }) => {
     if (!otterInstanceUrl) {

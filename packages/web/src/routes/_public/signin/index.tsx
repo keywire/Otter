@@ -4,6 +4,7 @@ import {
   useNavigate,
   useSearch,
 } from '@tanstack/react-router'
+import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
@@ -37,43 +38,49 @@ function RouteComponent() {
   const error = searchParams?.error
   const message = searchParams?.message
   const redirectTo = searchParams?.redirect
+  const [formError, setFormError] = useState<string | null>(null)
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsLoading(true)
+    setFormError(null)
 
     const formData = new FormData(event.target as HTMLFormElement)
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { error } = await authClient.signIn.email({
-      email,
-      password,
-    })
-
-    if (error) {
-      setIsLoading(false)
-      return navigate({
-        search: { message: 'Could not authenticate user' },
-        to: '/signin',
+    try {
+      const { error } = await authClient.signIn.email({
+        email,
+        password,
       })
-    }
 
-    setIsLoading(false)
-
-    // OAuth flow: window.location.search has sig param injected by oauthProviderClient
-    if (new URLSearchParams(window.location.search).has('sig')) {
-      const result = await authClient.oauth2.continue({ postLogin: true })
-      if (result.data?.url) {
-        window.location.href = result.data.url
+      if (error) {
+        // Generic on purpose: never reveal whether the email or the password
+        // was wrong (avoids account enumeration).
+        setFormError('Invalid email or password')
         return
       }
-    }
 
-    if (redirectTo) {
-      return navigate({ to: redirectTo })
+      // OAuth flow: window.location.search has sig param injected by oauthProviderClient
+      if (new URLSearchParams(window.location.search).has('sig')) {
+        const result = await authClient.oauth2.continue({ postLogin: true })
+        if (result.data?.url) {
+          window.location.href = result.data.url
+          return
+        }
+      }
+
+      if (redirectTo) {
+        return navigate({ to: redirectTo })
+      }
+      return navigate({ to: ROUTE_HOME })
+    } catch {
+      // A thrown error (network failure, 5xx, etc.) must not fail silently.
+      setFormError('Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
-    return navigate({ to: ROUTE_HOME })
   }
 
   return (
@@ -122,6 +129,11 @@ function RouteComponent() {
             </Link>
           ) : null}
 
+          {formError ? (
+            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
+              {formError}
+            </p>
+          ) : null}
           {error ? (
             <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
               {error}
